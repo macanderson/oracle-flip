@@ -2,7 +2,7 @@
 
 A Claude Code plugin that writes every tool call to a trace file and refuses to let the agent say the work is done until a hidden oracle reports PASS. The oracle says PASS or FAIL and nothing else.
 
-It is the reference plugin for [Building a continuous delivery system for fine-tuned open-source, open-weight models trained on your organization's traces](https://macanderson.com/research/continuous-delivery-of-fine-tuned-open-weight-models). Chapter 8 of that book walks through every file here.
+It is the reference plugin for [Building a continuous delivery system for fine-tuned open-source, open-weight models trained on your organization's traces](https://macanderson.com/research/continuous-delivery-of-fine-tuned-open-weight-models). [Chapter 8 of that book](https://macanderson.com/research/continuous-delivery-of-fine-tuned-open-weight-models/the-reference-plugin) walks through every file here.
 
 ## What it does
 
