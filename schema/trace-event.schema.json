@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/macanderson/oracle-flip/schema/trace-event.schema.json",
+  "title": "oracle-flip trace event",
+  "description": "One line of a session's trace file. Content fields hold redacted text; _hash fields hold the SHA-256 of the original.",
+  "type": "object",
+  "required": ["v", "session_id", "ts", "type"],
+  "properties": {
+    "v": { "const": 1 },
+    "session_id": { "type": "string" },
+    "ts": { "type": "string", "format": "date-time" },
+    "type": { "enum": ["session_start", "message", "tool_call", "oracle_verdict", "session_end"] }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "type": { "const": "session_start" },
+        "cwd": { "type": "string" },
+        "base_commit": { "type": ["string", "null"] },
+        "remote_url_hash": { "type": ["string", "null"] },
+        "model": { "type": ["string", "null"] },
+        "harness": { "type": "string" },
+        "source": { "type": ["string", "null"] },
+        "task_id": { "type": ["string", "null"] },
+        "config_hash": { "type": ["string", "null"] },
+        "config_error": { "type": ["string", "null"] }
+      },
+      "required": ["cwd", "harness"]
+    },
+    {
+      "properties": {
+        "type": { "const": "message" },
+        "turn": { "type": "integer" },
+        "role": { "enum": ["user", "assistant"] },
+        "text_redacted": { "type": "string" },
+        "text_hash": { "type": "string" },
+        "text_redactions": { "type": "integer" },
+        "truncated": { "type": "boolean" }
+      },
+      "required": ["turn", "role", "text_redacted", "text_hash"]
+    },
+    {
+      "properties": {
+        "type": { "const": "tool_call" },
+        "turn": { "type": "integer" },
+        "tool_name": { "type": ["string", "null"] },
+        "tool_use_id": { "type": ["string", "null"] },
+        "duration_ms": { "type": ["integer", "null"] },
+        "input_redacted": { "type": "string" },
+        "input_hash": { "type": "string" },
+        "input_redactions": { "type": "integer" },
+        "truncated": { "type": "boolean" },
+        "output_redacted": { "type": "string" },
+        "output_hash": { "type": "string" },
+        "output_redactions": { "type": "integer" },
+        "output_truncated": { "type": "boolean" }
+      },
+      "required": ["turn", "tool_name", "input_redacted", "input_hash", "output_redacted", "output_hash"]
+    },
+    {
+      "properties": {
+        "type": { "const": "oracle_verdict" },
+        "attempt": { "type": "integer" },
+        "mode": { "enum": ["baseline", "grade"] },
+        "verdict": { "enum": ["PASS", "FAIL", "ERROR"] },
+        "tests_hash": { "type": ["string", "null"] },
+        "image_digest": { "type": ["string", "null"] },
+        "diff_hash": { "type": ["string", "null"] },
+        "duration_ms": { "type": "integer" },
+        "error": { "type": ["string", "null"] },
+        "signature": { "type": "string" }
+      },
+      "required": ["attempt", "mode", "verdict"]
+    },
+    {
+      "properties": {
+        "type": { "const": "session_end" },
+        "outcome": { "enum": ["flipped", "no_flip", "no_task", "oracle_error", "aborted"] },
+        "attempts": { "type": "integer" },
+        "baseline": { "type": ["string", "null"] },
+        "reason": { "type": ["string", "null"] }
+      },
+      "required": ["outcome", "attempts"]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "oracle-flip",
+  "displayName": "Oracle flip",
+  "version": "0.1.0",
+  "description": "Writes every tool call to a trace file and refuses to let the agent stop until a hidden oracle reports PASS. The oracle says only PASS or FAIL.",
+  "author": { "name": "Mac Anderson", "url": "https://macanderson.com" },
+  "homepage": "https://macanderson.com/research/continuous-delivery-of-fine-tuned-open-weight-models",
+  "repository": "https://github.com/macanderson/oracle-flip",
+  "license": "MIT",
+  "keywords": ["traces", "oracle", "fine-tuning", "hooks", "swe-bench"],
+  "userConfig": {
+    "oracle_command": {
+      "type": "string",
+      "title": "Oracle command",
+      "description": "Command the Stop hook runs to grade the change. Exit 0 is PASS, 1 is FAIL. Leave empty to use the bundled oracle/run.sh."
+    },
+    "oracle_store": {
+      "type": "directory",
+      "title": "Oracle store",
+      "description": "Directory of hidden tests, one subdirectory per task id. Read by the bundled oracle. Keep it outside every repository the agent works in."
+    },
+    "oracle_image": {
+      "type": "string",
+      "title": "Oracle image",
+      "description": "Container image for the bundled oracle, pinned by digest, for example repo/oracle@sha256:..."
+    },
+    "oracle_timeout_seconds": {
+      "type": "number",
+      "title": "Oracle timeout",
+      "description": "Seconds the Stop hook waits for the oracle before recording an error.",
+      "default": 540,
+      "min": 30,
+      "max": 590
+    }
+  }
+}

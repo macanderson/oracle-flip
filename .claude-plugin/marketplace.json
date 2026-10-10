@@ -1,0 +1,15 @@
+{
+  "name": "macanderson",
+  "description": "Plugins by Mac Anderson",
+  "owner": { "name": "Mac Anderson", "url": "https://macanderson.com" },
+  "plugins": [
+    {
+      "name": "oracle-flip",
+      "source": ".",
+      "description": "Trace every tool call and gate Stop on a hidden, one-bit oracle.",
+      "version": "0.1.0",
+      "category": "development",
+      "tags": ["traces", "oracle", "fine-tuning", "hooks"]
+    }
+  ]
+}

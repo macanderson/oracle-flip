@@ -1,0 +1,8 @@
+# Paths the agent's diff may never change, even inside the allowlist.
+**/tests/**
+**/test_*.py
+**/conftest.py
+**/pytest.ini
+**/pyproject.toml
+**/setup.cfg
+.github/**

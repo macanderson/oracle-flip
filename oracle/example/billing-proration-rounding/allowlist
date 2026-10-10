@@ -1,0 +1,2 @@
+# Paths the agent's diff may change. Everything else is dropped before the tests run.
+src/**
