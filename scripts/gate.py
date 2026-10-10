@@ -85,7 +85,7 @@ def decide(event: dict[str, Any], state: SessionState, *, oracle: OracleFn = run
             state.outcome = "oracle_error"
             return allow()
 
-    cwd = event.get("cwd")
+    cwd = state.repo_root or event.get("cwd")
     if not isinstance(cwd, str):
         return allow()
     diff_path = data_dir() / "diffs" / f"{state.session_id}-{state.attempts + 1}.patch"

@@ -144,6 +144,8 @@ class SessionState:
     oracle_command: list[str] = field(default_factory=list)
     oracle_timeout_seconds: int = DEFAULT_ORACLE_TIMEOUT_SECONDS
     remote_url_hash: str | None = None
+    repo_root: str | None = None
+    started: bool = False
     turn: int = 0
     attempts: int = 0
     baseline: str | None = None  # PASS | FAIL | ERROR
@@ -213,6 +215,15 @@ def oracle_command_from_env() -> list[str]:
 
 def git(cwd: str, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=check, timeout=60)
+
+
+def git_toplevel(cwd: str) -> str | None:
+    """The repository root, so a session started in a subdirectory finds the config and diffs whole paths."""
+    try:
+        return git(cwd, "rev-parse", "--show-toplevel").stdout.strip() or None
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as error:
+        log(f"not inside a git repository: {error}")
+        return None
 
 
 def git_head(cwd: str) -> str | None:

@@ -1,0 +1,6 @@
+# Pinned dependencies for the repository under test, with hashes, so the oracle
+# container needs no network at run time. Generate for your project, for example:
+#   pip-compile --generate-hashes -o oracle/requirements.lock pyproject.toml
+# or
+#   uv pip compile --generate-hashes pyproject.toml -o oracle/requirements.lock
+# The file ships empty so `docker build` runs on the template.

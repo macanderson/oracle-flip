@@ -6,7 +6,7 @@ It is the reference plugin for [Building a continuous delivery system for fine-t
 
 ## What it does
 
-1. **SessionStart** records the session: the base commit, the model, and the task id from `.oracle-flip/config.json`. The configuration is snapshotted here. Edits the agent makes to it later do not reach the gate.
+1. **SessionStart** records the session: the repository root, the base commit, the model, and the task id from `.oracle-flip/config.json` at that root. The configuration is snapshotted here, once. Edits the agent makes to it later do not reach the gate, and a resume or compaction does not move the base commit.
 2. **UserPromptSubmit** and **PostToolUse** append `message` and `tool_call` events to `traces/<session_id>.jsonl` in the plugin's data directory. Inputs and outputs are redacted with secret patterns and truncated to 64 KB, with a hash of the original kept beside them.
 3. **Stop** records the agent's final message, builds the diff against the base commit, and asks the oracle. On the first Stop it also asks for the baseline. On FAIL it blocks the stop with a fixed reason. On PASS it lets the agent stop and records the session as `flipped`. After `max_attempts` FAILs it records `no_flip` and lets the agent stop.
 4. **SessionEnd** closes the trace with the outcome.
@@ -31,7 +31,7 @@ Requires `python3` and `git`. The bundled oracle runner also needs `docker`.
 
 ## Configure
 
-Three settings live in the plugin's user configuration (Claude Code asks for them when the plugin is enabled; they are stored outside every repository):
+Four settings live in the plugin's user configuration (Claude Code asks for them when the plugin is enabled; they are stored outside every repository):
 
 | Setting | Meaning |
 |---|---|

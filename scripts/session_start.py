@@ -4,6 +4,10 @@ The configuration is read here and stored in the session state. The Stop hook
 reads the state, not the project, so changes the agent makes to
 .oracle-flip/config.json during the session do not reach the gate. Nothing
 slow runs here; the oracle baseline is computed on the first Stop.
+
+A resume or a compaction fires SessionStart again with the same session id.
+The snapshot is taken once: a later SessionStart for a started session changes
+nothing, so a commit the agent made mid-session does not move the base commit.
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ from common import (
     ConfigError,
     git_head,
     git_remote_url_hash,
+    git_toplevel,
     load_config,
     load_state,
     log,
@@ -38,16 +43,22 @@ def main() -> int:
         return 0
 
     state = load_state(event["session_id"])
+    if state.started:
+        log(f"session already started; SessionStart with source {event.get('source')!r} keeps the snapshot")
+        return 0
+
+    root = git_toplevel(cwd) or cwd
     config = None
     config_error = None
     try:
-        config = load_config(cwd)
+        config = load_config(root)
     except ConfigError as error:
         config_error = str(error)
         log(config_error)
 
-    head = git_head(cwd)
-    state.remote_url_hash = git_remote_url_hash(cwd)
+    head = git_head(root)
+    state.repo_root = root
+    state.remote_url_hash = git_remote_url_hash(root)
     if config is not None and head is not None:
         state.task_id = config["task_id"]
         state.base_commit = config["base_commit"] or head
@@ -55,12 +66,13 @@ def main() -> int:
         state.oracle_command = oracle_command_from_env()
         timeout = os.environ.get("CLAUDE_PLUGIN_OPTION_ORACLE_TIMEOUT_SECONDS", "")
         state.oracle_timeout_seconds = int(timeout) if timeout.isdigit() else DEFAULT_ORACLE_TIMEOUT_SECONDS
+    state.started = True
     save_state(state)
 
     write_event(
         event["session_id"],
         "session_start",
-        cwd=cwd,
+        cwd=root,
         base_commit=state.base_commit or head,
         remote_url_hash=state.remote_url_hash,
         model=event.get("model"),
